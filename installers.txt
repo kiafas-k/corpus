@@ -1,0 +1,7 @@
+MySQLdb --> /home/viper/python-projects/corpus/bin/python3 -m pip install mysqlclient
+
+nltk
+
+numpy
+
+newspaper3k
