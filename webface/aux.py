@@ -75,4 +75,14 @@ def getStats():
 
     stats['sources'] = sources
 
+    # get topics
+    query = 'select distinct topic from tbl_articles'
+    result = dbexec('select', query)
+    if result['success']:
+        topics = result['rows_returned']
+    else:
+        topics = 'N/A'
+
+    stats['topics'] = topics
+
     return(stats)

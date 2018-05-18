@@ -40,7 +40,7 @@ class myHandler(BaseHTTPRequestHandler):
                                         {
                                             '{total_articles}': stats['total_articles'],
                                             '{sources}': stats['sources'],
-                                            '{topics}': '5',
+                                            '{topics}': stats['topics'],
                                             '{time_span}': '38 days'
                                         }
                                         )
