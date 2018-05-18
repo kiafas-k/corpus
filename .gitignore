@@ -106,3 +106,13 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+
+# webface template components
+bower_components
+css
+img
+js
+plugins
+
+

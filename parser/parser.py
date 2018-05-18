@@ -20,7 +20,7 @@ fl.close
 
 words_pos = []
 
-# test
+
 for wrd in lines:
     words_pos.append(wrd.replace('\n', ''))
 
