@@ -86,3 +86,41 @@ def getStats():
     stats['topics'] = topics
 
     return(stats)
+
+
+def prepareData():
+
+    data = {}
+
+    # get timespan
+    timespan = {}
+    query = 'select max(timestamp) as newest, min(timestamp) as oldest from tbl_articles'
+    result = dbexec('select', query)
+    timespan['newest'] = result['data'][0][0]
+    timespan['oldest'] = result['data'][0][1]
+    data['timespan'] = timespan
+
+    # get named entities
+    named_entities = []
+    query = 'select named_entities from tbl_articles'
+    result = dbexec('select', query)
+    for myrow in result['data']:
+        row_entities = myrow[0].split(';')
+        for entity in row_entities:
+            named_entities.append(entity)
+
+    named_entities.sort()
+    unique_entities = set(named_entities)
+
+    data['named_entities'] = unique_entities
+
+    # get topics
+    topics = []
+    query = 'select distinct topic from tbl_articles'
+    result = dbexec('select', query)
+    for myrow in result['data']:
+        topics.append(myrow[0])
+
+    data['topics'] = topics
+
+    return data

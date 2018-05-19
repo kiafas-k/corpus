@@ -34,7 +34,7 @@ for src in sources['data']:
 
     # download articles
     paper = newspaper.build(
-        src[1], memoize_articles=False)
+        src[1], memoize_articles=True)
 
     for article in paper.articles:
 
