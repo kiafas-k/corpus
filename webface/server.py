@@ -1,7 +1,8 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import subprocess
-from aux import dbexec, parseTemplate, getStats, prepareData
+from aux import dbexec, parseTemplate, getStats, prepareData, handlePOSTdata
 from io import BytesIO
+import time
 
 
 def getRAM():
@@ -68,7 +69,7 @@ class myHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
             message = parseTemplate(
-                'layout1.html', {'{page_content}': content})
+                'layout2.html', {'{page_content}': content})
 
             self.wfile.write(message.encode())
 
@@ -83,20 +84,68 @@ class myHandler(BaseHTTPRequestHandler):
         return
 
     def do_POST(self):
-        # content_length = int(self.headers['Content-Length'])
-        # post_data = self.rfile.read(content_length)
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
 
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+
+        parameters = handlePOSTdata(post_data)
+
+        query = 'select * from tbl_articles where topic="{}" and '.format(
+            parameters['topic'])
+        counter = 0
+        for entity in parameters['entities']:
+            if counter > 0:
+                query += ' OR '
+            query += ' named_entities like "%{}%"'.format(
+                entity.replace('+', ' '))
+            counter += 1
+
+        result = dbexec('select', query)
+
+        if result['success']:
+            content = '<ul class="timeline">'
+            for myrow in result['data']:
+                human_time = time.strftime(
+                    "%d-%m-%Y %H:%M:%S", time.gmtime(int(myrow[3])))
+
+                if myrow[9] == 'pos':
+                    sentiment_color = 'green'
+                if myrow[9] == 'neg':
+                    sentiment_color = 'red'
+                if myrow[9] == 'neu':
+                    sentiment_color = 'yellow'
+
+                content += parseTemplate('content-timeline-item.html', {
+                    '{date}': human_time,
+                    '{source}': myrow[4],
+                    '{title}': myrow[1],
+                    '{body}': parameters['timespan'],
+                    '{url}': myrow[2],
+                    '{sentiment_color}': sentiment_color
+
+                })
+            content += '</ul>'
+        else:
+            content = 'There was an error processing your data. <br> Please try again'
+
+        message = parseTemplate(
+            'layout2.html', {'{page_content}': content})
+
+        self.wfile.write(message.encode())
         # print(post_data)
 
-        content_length = int(self.headers['Content-Length'])
-        body = self.rfile.read(content_length)
-        self.send_response(200)
-        self.end_headers()
-        response = BytesIO()
-        response.write(b'This is POST request. ')
-        response.write(b'Received: ')
-        response.write(body)
-        self.wfile.write(response.getvalue())
+        # content_length = int(self.headers['Content-Length'])
+        # body = self.rfile.read(content_length)
+        # self.send_response(200)
+        # self.end_headers()
+        # response = BytesIO()
+        # response.write(b'This is POST request. ')
+        # response.write(b'Received: ')
+        # response.write(body)
+        # self.wfile.write(response.getvalue())
 
         return
 

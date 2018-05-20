@@ -124,3 +124,27 @@ def prepareData():
     data['topics'] = topics
 
     return data
+
+
+def handlePOSTdata(request_data):
+
+    data = {
+        'topic': '',
+        'entities': [],
+        'timespan': '---'
+    }
+
+    txt_data = request_data.decode()
+    components = txt_data.split('&')
+    for component in components:
+        parts = component.split('=')
+        if 'topic' in parts[0]:
+            data['topic'] = parts[1]
+
+        if 'entities' in parts[0]:
+            data['entities'].append(parts[1])
+
+        if 'timespan' in parts[0]:
+            data['timespan'] = parts[1]
+
+    return data
