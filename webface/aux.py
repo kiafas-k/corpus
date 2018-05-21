@@ -1,4 +1,6 @@
 import MySQLdb
+import time
+import datetime
 
 
 def dbexec(operation_type, query):
@@ -148,3 +150,18 @@ def handlePOSTdata(request_data):
             data['timespan'] = parts[1]
 
     return data
+
+
+def dateToTimestamp(date_string):
+    date_elements = date_string.split('/')
+    timestamp = datetime.datetime(int(date_elements[2]), int(
+        date_elements[1]), int(date_elements[0]), 0, 0).timestamp()
+
+    return int(timestamp)
+
+
+def timestampToDate(timestamp):
+    human_time = time.strftime(
+        "%d-%m-%Y %H:%M:%S", time.gmtime(int(timestamp)))
+
+    return human_time

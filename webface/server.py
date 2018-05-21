@@ -1,8 +1,10 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import subprocess
-from aux import dbexec, parseTemplate, getStats, prepareData, handlePOSTdata
+from aux import dbexec, parseTemplate, getStats, prepareData, handlePOSTdata, dateToTimestamp, timestampToDate
 from io import BytesIO
-import time
+# import time
+import urllib.parse
+import datetime
 
 
 def getRAM():
@@ -93,23 +95,28 @@ class myHandler(BaseHTTPRequestHandler):
 
         parameters = handlePOSTdata(post_data)
 
-        query = 'select * from tbl_articles where topic="{}" and '.format(
-            parameters['topic'])
+        timespan = urllib.parse.unquote(
+            parameters['timespan']).replace('+', '')
+        date_range = timespan.split('-')
+        start_date = dateToTimestamp(date_range[0])
+        end_date = dateToTimestamp(date_range[1])
+
+        query = 'select * from tbl_articles where topic="{}" and timestamp between {} and {} and '.format(
+            parameters['topic'], start_date, end_date)
         counter = 0
         for entity in parameters['entities']:
             if counter > 0:
                 query += ' OR '
             query += ' named_entities like "%{}%"'.format(
                 entity.replace('+', ' '))
-            counter += 1
 
+            counter += 1
         result = dbexec('select', query)
 
-        if result['success']:
+        if result['success'] and result['rows_returned'] > 0:
             content = '<ul class="timeline">'
             for myrow in result['data']:
-                human_time = time.strftime(
-                    "%d-%m-%Y %H:%M:%S", time.gmtime(int(myrow[3])))
+                human_time = timestampToDate(myrow[3])
 
                 if myrow[9] == 'pos':
                     sentiment_color = 'green'
@@ -122,14 +129,19 @@ class myHandler(BaseHTTPRequestHandler):
                     '{date}': human_time,
                     '{source}': myrow[4],
                     '{title}': myrow[1],
-                    '{body}': parameters['timespan'],
+                    '{body}': '{} - {}'.format(start_date, end_date),
                     '{url}': myrow[2],
+                    '{sentiment}': myrow[9],
                     '{sentiment_color}': sentiment_color
 
                 })
             content += '</ul>'
         else:
-            content = 'There was an error processing your data. <br> Please try again'
+            content = parseTemplate('content-message.html', {
+                '{type}': 'warning',
+                '{message_title}': 'Warning',
+                '{message_text}': 'There are no data for this creteria. <br> Please try again',
+            })
 
         message = parseTemplate(
             'layout2.html', {'{page_content}': content})
