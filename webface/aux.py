@@ -1,6 +1,9 @@
 import MySQLdb
 import time
 import datetime
+from nltk import PorterStemmer, word_tokenize
+from nltk.corpus import stopwords
+import random
 
 
 def dbexec(operation_type, query):
@@ -38,17 +41,17 @@ def dbexec(operation_type, query):
 
 
 def parseTemplate(filename, pagedata):
-    # try:
-    fl = open('webface/templates/' + filename, 'r')
-    content = fl.readlines()
-    content = ''.join(content)
-    fl.close
+    try:
+        fl = open('webface/templates/' + filename, 'r')
+        content = fl.readlines()
+        content = ''.join(content)
+        fl.close
 
-    placeholders = pagedata.keys()
-    for placeholder in placeholders:
-        content = content.replace(placeholder, str(pagedata[placeholder]))
-    # except:
-        # content = 'Error parsing template'
+        placeholders = pagedata.keys()
+        for placeholder in placeholders:
+            content = content.replace(placeholder, str(pagedata[placeholder]))
+    except:
+        content = 'Error parsing template'
 
     return content
 
@@ -104,7 +107,7 @@ def prepareData():
 
     # get named entities
     named_entities = []
-    query = 'select named_entities from tbl_articles'
+    query = 'select named_entities from tbl_articles order by id'
     result = dbexec('select', query)
     for myrow in result['data']:
         row_entities = myrow[0].split(';')
@@ -165,3 +168,34 @@ def timestampToDate(timestamp):
         "%d-%m-%Y %H:%M:%S", time.gmtime(int(timestamp)))
 
     return human_time
+
+
+def filterText(text, stemmed=False):
+    if stemmed:
+        porter = PorterStemmer()
+
+    # remove stopwords and useless words
+    stop_words = set(stopwords.words('english'))
+    words = word_tokenize(text)
+
+    valuable_words = []
+    for wrd in words:
+        if len(wrd) > 3 and not wrd in stop_words:
+            if stemmed:
+                valuable_words.append(porter.stem(wrd.lower()))
+            else:
+                valuable_words.append(wrd.lower())
+
+    return valuable_words
+
+
+def randomFileName():
+    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+               'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+
+    filename = ''
+
+    while len(filename) <= 30:
+        filename += letters[random.randint(0, len(letters) - 1)]
+
+    return filename
