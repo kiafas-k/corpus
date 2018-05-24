@@ -116,4 +116,6 @@ js
 plugins
 
 # training sets binary files
-#training-sets/
+*.pickle
+
+test-*

@@ -40,6 +40,22 @@ class myHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
 
+        # serve pickle file
+        if '.pickle' in self.path:
+            url_components = self.path.split('/')
+            filename = url_components[-1]
+
+            self.send_response(200)
+            self.send_header('Content-type', 'application/octet-stream')
+            self.end_headers()
+
+            binfile = open('webface/training-sets/{}'.format(filename), 'rb')
+            content = binfile.read()
+            binfile.close
+
+            self.wfile.write(content)
+            return
+
         if self.path in pages:
 
             content = ''
@@ -181,13 +197,14 @@ class myHandler(BaseHTTPRequestHandler):
                         word_features = list(all_words.keys())[:3000]
                         featuresets = [(find_features(rev, word_features), category)
                                        for (rev, category) in documents]
-                        training_set = featuresets[:1900]
-                        testing_set = featuresets[1900:]
+                        training_set = featuresets
+
                         classifier = NaiveBayesClassifier.train(training_set)
 
                         # save training set to binary file
+                        filename = randomFileName() + '.pickle'
                         binaryfile = 'webface/training-sets/{}'.format(
-                            randomFileName() + '.pickle')
+                            filename)
                         save_classifier = open(binaryfile, 'wb')
                         pickle.dump(classifier, save_classifier)
                         save_classifier.close()
@@ -195,7 +212,7 @@ class myHandler(BaseHTTPRequestHandler):
                         content = parseTemplate('content-message.html', {
                             '{type}': 'success',
                             '{message_title}': 'Success',
-                            '{message_text}': 'Your training set was built sucessfuly ! <BR> <BR> Clink <a href="training-sets/{}" target="_blank">HERE</a> to download the binary file'.format(binaryfile),
+                            '{message_text}': 'Your training set was built sucessfuly ! <BR> <BR> Clink <a href="/training-sets/{}" target="_blank">HERE</a> to download the binary file'.format(filename),
                         })
 
                     except:
