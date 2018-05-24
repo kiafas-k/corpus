@@ -118,4 +118,8 @@ plugins
 # training sets binary files
 *.pickle
 
+# test files
 test-*
+
+# tasks to do file
+todo.txt
