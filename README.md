@@ -28,7 +28,7 @@ It provides 2 things :
 
 Corpus requires python 3.5 or higher.
 
-- Clone Corpus from github to a folder of your choice (<PATH>)
+- Clone Corpus from github to a folder of your choice <PATH>
 
 - Create a python virtual enironment to that folder
 
