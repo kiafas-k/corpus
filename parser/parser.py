@@ -2,6 +2,7 @@ import newspaper
 from aux import createSummary, filterText, getSentiment, NE_extract, dbexec, removeQuotes
 import time
 import MySQLdb
+import configparser
 
 # load pos neg words
 fl = open('parser/negative-words.txt', 'r')
@@ -61,8 +62,11 @@ for src in sources['data']:
             sentiment = 'neg'
 
         try:
-            db = MySQLdb.connect("10.0.0.108", "viper",
-                                 "d9180pa", "articles",)
+            configuration = configparser.ConfigParser()
+            configuration.read('parser/config.ini')
+
+            db = MySQLdb.connect(
+                configuration['DATABASE']['host'], configuration['DATABASE']['username'], configuration['DATABASE']['password'], configuration['DATABASE']['database'],)
             db.set_character_set('utf8')
             cursor = db.cursor()
 

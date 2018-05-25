@@ -1,4 +1,5 @@
 import MySQLdb
+import configparser
 import time
 import datetime
 from nltk import PorterStemmer, word_tokenize
@@ -7,6 +8,8 @@ import random
 
 
 def dbexec(operation_type, query):
+    configuration = configparser.ConfigParser()
+    configuration.read('webface/config.ini')
 
     result = {
         'success': True,
@@ -18,7 +21,8 @@ def dbexec(operation_type, query):
     if not operation_type in['insert', 'update', 'delete', 'select']:
         result['success'] = False
     else:
-        db = MySQLdb.connect("10.0.0.108", "viper", "d9180pa", "articles",)
+        db = MySQLdb.connect(
+            configuration['DATABASE']['host'], configuration['DATABASE']['username'], configuration['DATABASE']['password'], configuration['DATABASE']['database'],)
         db.set_character_set('utf8')
         cursor = db.cursor()
 
