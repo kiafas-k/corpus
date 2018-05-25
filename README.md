@@ -1,7 +1,7 @@
 # Corpus
 
 Corpus is an automated corpora builder with NLP capabilities.
-Journalists can use it to visualise and monitor sentiment and public opinion about specific topics or entities such as companies or public figures and researchers can use it to build training sets for NLP experimentations. <br>
+Journalists can use it to visualise and monitor sentiment and public opinion about specific topics or entities such as companies or public figures and researchers can use it to build training sets for NLP experimentations. <br\>
 Corpus can also be used to monitor stock behavior in relevance to significant events. <br>
 The longer the parser is on-line the larger the corpora becomes leading to more accurate results.
 
