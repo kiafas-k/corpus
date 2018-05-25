@@ -52,7 +52,7 @@ python3 -m venv <PATH>
 Use the db_structure.sql file to create the database
 
 
-### Configuration
+## Configuration
 Each of the two sub systems has a config.ini file in the root folder. 
 Modify them according to your setup.
 
