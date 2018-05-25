@@ -8,6 +8,7 @@ import datetime
 import random
 from nltk import word_tokenize, FreqDist, NaiveBayesClassifier, classify
 import pickle
+import configparser
 
 
 def loadFile(filename):
@@ -250,5 +251,11 @@ pages = [
 ]
 
 
-myServer = HTTPServer(('', 8000), myHandler)
+configuration = configparser.ConfigParser()
+configuration.read('webface/config.ini')
+HOST = configuration['SERVER']['host']
+PORT = configuration['SERVER']['port']
+
+
+myServer = HTTPServer((HOST, PORT), myHandler)
 myServer.serve_forever()
