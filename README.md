@@ -24,7 +24,7 @@ It provides 2 things :
 
 
 
-### Installation for Linux
+## Installation for Linux
 
 Corpus requires python 3.5 or higher.
 
@@ -48,5 +48,25 @@ python3 -m venv <PATH>
 ```
 
 
-### Create the database
-Use the db_dump file to create the database
+## Create the database
+Use the db_structure.sql file to create the database
+
+
+## Usage
+### The Parser
+The command to execute the parser is :
+```sh
+<PATH>/bin/python3 <PATH>/parser/parser.py
+```
+However Parser is not designed to repeat itself or become a memmory resident application. In order to repeat its execution you will need to add the execution command to a scheduled job on your system.
+
+### The webface
+The command to execute the webface is :
+```sh
+<PATH>/bin/python3 <PATH>/webface/server.py
+```
+
+Webface uses the Python's HTTPServer library and it serves for ever on port 8000. If you want to stop the server you have to do it manualy.
+
+
+
