@@ -134,8 +134,8 @@ class myHandler(BaseHTTPRequestHandler):
                 start_date = dateToTimestamp(date_range[0])
                 end_date = dateToTimestamp(date_range[1])
 
-                query = 'select * from tbl_articles where topic="{}" and timestamp between {} and {} and '.format(
-                    parameters['topic'], start_date, end_date)
+                query = 'select * from tbl_articles where '
+
                 counter = 0
                 for entity in parameters['entities']:
                     if counter > 0:
@@ -144,7 +144,10 @@ class myHandler(BaseHTTPRequestHandler):
                         entity.replace('+', ' '))
 
                     counter += 1
-                print(query)
+
+                query += ' and topic="{}" and timestamp between {} and {}'.format(
+                    parameters['topic'], start_date, end_date)
+
                 result = dbexec('select', query)
 
             # Display insights
@@ -261,4 +264,4 @@ try:
     myServer = HTTPServer((HOST, int(PORT)), myHandler)
     myServer.serve_forever()
 except:
-    print('There was an error starting the server...')
+    print('Server has stopped')
