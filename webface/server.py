@@ -144,6 +144,7 @@ class myHandler(BaseHTTPRequestHandler):
                         entity.replace('+', ' '))
 
                     counter += 1
+                print(query)
                 result = dbexec('select', query)
 
             # Display insights
@@ -176,7 +177,7 @@ class myHandler(BaseHTTPRequestHandler):
                     content = parseTemplate('content-message.html', {
                         '{type}': 'warning',
                         '{message_title}': 'Warning',
-                        '{message_text}': 'There are no data for this creteria. <br> Please try again',
+                        '{message_text}': 'There are no data for this criteria. <br> Please try again',
                     })
 
             # Build the training set
@@ -227,7 +228,7 @@ class myHandler(BaseHTTPRequestHandler):
                     content = parseTemplate('content-message.html', {
                         '{type}': 'warning',
                         '{message_title}': 'Warning',
-                        '{message_text}': 'There are no data for this creteria. <br> Please try again',
+                        '{message_text}': 'There are no data for this criteria. <br> Please try again',
                     })
 
             message = parseTemplate(
@@ -256,6 +257,8 @@ configuration.read('webface/config.ini')
 HOST = configuration['SERVER']['host']
 PORT = configuration['SERVER']['port']
 
-
-myServer = HTTPServer((HOST, PORT), myHandler)
-myServer.serve_forever()
+try:
+    myServer = HTTPServer((HOST, int(PORT)), myHandler)
+    myServer.serve_forever()
+except:
+    print('There was an error starting the server...')
