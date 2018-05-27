@@ -144,10 +144,12 @@ class myHandler(BaseHTTPRequestHandler):
                         entity.replace('+', ' '))
 
                     counter += 1
+                if counter > 0:
+                    query += ' and '
 
-                query += ' and topic="{}" and timestamp between {} and {}'.format(
+                query += ' topic="{}" and (timestamp between {} and {})'.format(
                     parameters['topic'], start_date, end_date)
-
+                print(query)
                 result = dbexec('select', query)
 
             # Display insights
