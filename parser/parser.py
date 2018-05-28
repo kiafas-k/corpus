@@ -72,28 +72,29 @@ for src in sources['data']:
             sentiment = 'neg'
 
         try:
-            configuration = configparser.ConfigParser()
-            configuration.read('parser/config.ini')
+            if sentiment_analysis['text_size'] > 0:
+                configuration = configparser.ConfigParser()
+                configuration.read('parser/config.ini')
 
-            db = MySQLdb.connect(
-                configuration['DATABASE']['host'], configuration['DATABASE']['username'], configuration['DATABASE']['password'], configuration['DATABASE']['database'],)
-            db.set_character_set('utf8')
-            cursor = db.cursor()
+                db = MySQLdb.connect(
+                    configuration['DATABASE']['host'], configuration['DATABASE']['username'], configuration['DATABASE']['password'], configuration['DATABASE']['database'],)
+                db.set_character_set('utf8')
+                cursor = db.cursor()
 
-            text = removeQuotes(text)
-            text = str(db.escape_string(text))
-            text = text[2: - 2]
+                text = removeQuotes(text)
+                text = str(db.escape_string(text))
+                text = text[2: - 2]
 
-            title = removeQuotes(title)
-            title = str(db.escape_string(title))
-            title = title[2: -2]
+                title = removeQuotes(title)
+                title = str(db.escape_string(title))
+                title = title[2: -2]
 
-            query = '''insert into tbl_articles (title,url,timestamp,source,keywords,text,named_entities,topic,sentiment) values (%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
+                query = '''insert into tbl_articles (title,url,timestamp,source,keywords,text,named_entities,topic,sentiment) values (%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
 
-            cursor.execute(query, (title, url, timestamp, source,
-                                   keywords, text, named_entities, topic, sentiment))
-            db.commit()
-            db.close()
+                cursor.execute(query, (title, url, timestamp, source,
+                                       keywords, text, named_entities, topic, sentiment))
+                db.commit()
+                db.close()
 
         except:
             print('failed to store {}'.format(article.title))

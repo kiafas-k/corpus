@@ -138,25 +138,31 @@ def getSentiment(text, pos_keys, neg_keys):
     negative_keys = 0
     text_size = 0
 
-    filtered_text = filterText(text, False)
-    text_size = len(filtered_text)
+    try:
+        filtered_text = filterText(text, False)
+        text_size = len(filtered_text)
 
-    for wrd in filtered_text:
-        if wrd in pos_keys:
-            positive_keys += 1
+        for wrd in filtered_text:
+            if wrd in pos_keys:
+                positive_keys += 1
 
-        if wrd in neg_keys:
-            negative_keys += 1
+            if wrd in neg_keys:
+                negative_keys += 1
 
-    percentage_positive = (positive_keys / text_size) / 100
-    percentage_negative = (negative_keys / text_size) / 100
+        percentage_positive = (positive_keys / text_size) / 100
+        percentage_negative = (negative_keys / text_size) / 100
 
-    results['positive'] = positive_keys
-    results['positive_percentage'] = percentage_positive
-    results['negative'] = negative_keys
-    results['negative_percentage'] = percentage_negative
-    results['text_size'] = text_size
-
+        results['positive'] = positive_keys
+        results['positive_percentage'] = percentage_positive
+        results['negative'] = negative_keys
+        results['negative_percentage'] = percentage_negative
+        results['text_size'] = text_size
+    except:
+        results['positive'] = 0
+        results['positive_percentage'] = 0
+        results['negative'] = 0
+        results['negative_percentage'] = 0
+        results['text_size'] = 0
     return results
 
 
