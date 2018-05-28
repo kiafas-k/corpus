@@ -37,6 +37,8 @@ for src in sources['data']:
     paper = newspaper.build(
         src[1], memoize_articles=True)
 
+    print('Paper size : {}'.format(paper.size))
+
     for article in paper.articles:
 
         # if isinstance(article.title, str) and len(article.title) > 1:
