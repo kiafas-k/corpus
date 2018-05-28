@@ -2,7 +2,7 @@
 
 Corpus is an automated corpora builder with NLP capabilities.
 Journalists can use it to visualise and monitor sentiment and public opinion about specific topics or entities such as companies or public figures and researchers can use it to build training sets for NLP experimentations. 
-Corpus can also be used to monitor stock behavior in relevance to significant events. 
+Corpus can also be used to visualize and examine the impact of a significant event to the stock market.
 The longer the parser is on-line the larger the corpora becomes leading to more accurate results.
 
 It is consisted of 2 sub systems:
@@ -26,7 +26,7 @@ It provides 2 things :
 
 
 
-## Installation for Linux
+## Developing on Linux
 
 Corpus requires python 3.5 or higher.
 
@@ -74,7 +74,7 @@ The command to execute the webface is :
 <PATH>/bin/python3 <PATH>/webface/server.py
 ```
 
-Webface uses the Python's HTTPServer library and it serves for ever on port 8000. If you want to stop the server you have to do it manualy.
+Webface uses the Python's HTTPServer library and it serves for ever. If you want to stop the server you have to do it manualy.
 
 
 

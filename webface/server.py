@@ -219,7 +219,7 @@ class myHandler(BaseHTTPRequestHandler):
                         content = parseTemplate('content-message.html', {
                             '{type}': 'success',
                             '{message_title}': 'Success',
-                            '{message_text}': 'Your training set was built sucessfuly ! <BR> <BR> Clink <a href="/training-sets/{}" target="_blank">HERE</a> to download the binary file'.format(filename),
+                            '{message_text}': 'Your training set was built sucessfully ! <BR> <BR> Clink <a href="/training-sets/{}" target="_blank">HERE</a> to download the binary file'.format(filename),
                         })
 
                     except:
@@ -263,6 +263,7 @@ HOST = configuration['SERVER']['host']
 PORT = configuration['SERVER']['port']
 
 try:
+    print('Starting server on {}:{}'.format(HOST, PORT))
     myServer = HTTPServer((HOST, int(PORT)), myHandler)
     myServer.serve_forever()
 except:
