@@ -37,7 +37,7 @@ for src in sources['data']:
     paper = newspaper.build(
         src[1], memoize_articles=True)
 
-    print('Paper size : {}'.format(paper.size))
+    print('Paper size : {}'.format(paper.size()))
 
     for article in paper.articles:
 
