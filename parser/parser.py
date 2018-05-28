@@ -50,28 +50,27 @@ for src in sources['data']:
     for article in paper.articles:
 
         # if isinstance(article.title, str) and len(article.title) > 1:
-
-        article.download()
-        article.parse()
-
-        title = article.title
-        url = article.url
-        timestamp = int(time.time())
-        source = src[1]
-        keywords = ''
-        text = article.text
-        named_entities = ';'.join(NE_extract(article.text))
-        topic = src[2]
-
-        sentiment = 'neu'
-        sentiment_analysis = getSentiment(
-            article.text, words_pos, words_neg)
-        if sentiment_analysis['positive_percentage'] > sentiment_analysis['negative_percentage']:
-            sentiment = 'pos'
-        else:
-            sentiment = 'neg'
-
         try:
+            article.download()
+            article.parse()
+
+            title = article.title
+            url = article.url
+            timestamp = int(time.time())
+            source = src[1]
+            keywords = ''
+            text = article.text
+            named_entities = ';'.join(NE_extract(article.text))
+            topic = src[2]
+
+            sentiment = 'neu'
+            sentiment_analysis = getSentiment(
+                article.text, words_pos, words_neg)
+            if sentiment_analysis['positive_percentage'] > sentiment_analysis['negative_percentage']:
+                sentiment = 'pos'
+            else:
+                sentiment = 'neg'
+
             if sentiment_analysis['text_size'] > 0:
                 configuration = configparser.ConfigParser()
                 configuration.read('parser/config.ini')
