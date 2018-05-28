@@ -3,9 +3,15 @@ from aux import createSummary, filterText, getSentiment, NE_extract, dbexec, rem
 import time
 import MySQLdb
 import configparser
+import sys
+
+path_prefix = ''
+if len(sys.argv) > 1:
+    path_prefix = sys.argv[1]
+
 
 # load pos neg words
-fl = open('parser/negative-words.txt', 'r')
+fl = open(path_prefix + 'parser/negative-words.txt', 'r')
 lines = fl.readlines()
 fl.close
 
@@ -15,7 +21,7 @@ words_neg = []
 for wrd in lines:
     words_neg.append(wrd.replace('\n', ''))
 
-fl = open('parser/positive-words.txt', 'r')
+fl = open(path_prefix + 'parser/positive-words.txt', 'r')
 lines = fl.readlines()
 fl.close
 
@@ -65,7 +71,7 @@ for src in sources['data']:
 
         try:
             configuration = configparser.ConfigParser()
-            configuration.read('parser/config.ini')
+            configuration.read(path_prefix + 'parser/config.ini')
 
             db = MySQLdb.connect(
                 configuration['DATABASE']['host'], configuration['DATABASE']['username'], configuration['DATABASE']['password'], configuration['DATABASE']['database'],)
