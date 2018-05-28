@@ -4,14 +4,16 @@ import time
 import MySQLdb
 import configparser
 import sys
+import os
+
 
 path_prefix = ''
 if len(sys.argv) > 1:
-    path_prefix = sys.argv[1]
+    os.chdir(sys.argv[1])
 
 
 # load pos neg words
-fl = open(path_prefix + 'parser/negative-words.txt', 'r')
+fl = open('parser/negative-words.txt', 'r')
 lines = fl.readlines()
 fl.close
 
@@ -21,7 +23,7 @@ words_neg = []
 for wrd in lines:
     words_neg.append(wrd.replace('\n', ''))
 
-fl = open(path_prefix + 'parser/positive-words.txt', 'r')
+fl = open('parser/positive-words.txt', 'r')
 lines = fl.readlines()
 fl.close
 
@@ -71,7 +73,7 @@ for src in sources['data']:
 
         try:
             configuration = configparser.ConfigParser()
-            configuration.read(path_prefix + 'parser/config.ini')
+            configuration.read('parser/config.ini')
 
             db = MySQLdb.connect(
                 configuration['DATABASE']['host'], configuration['DATABASE']['username'], configuration['DATABASE']['password'], configuration['DATABASE']['database'],)
