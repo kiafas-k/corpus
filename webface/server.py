@@ -61,7 +61,7 @@ class myHandler(BaseHTTPRequestHandler):
 
             content = ''
 
-            if self.path in ('/', '/dashboard'):
+            if self.path in ('/', '/home'):
                 content += loadFile('webface/templates/content-dashboard.html')
 
             if self.path == '/stats':
@@ -71,7 +71,9 @@ class myHandler(BaseHTTPRequestHandler):
                                             '{total_articles}': stats['total_articles'],
                                             '{sources}': stats['sources'],
                                             '{topics}': stats['topics'],
-                                            '{time_span}': '38 days'
+                                            '{time_span}': '38 days',
+                                            '{sources_full}': stats['sources_full'],
+                                            '{topics_full}': stats['topics_full']
                                         }
                                         )
 
@@ -149,25 +151,31 @@ class myHandler(BaseHTTPRequestHandler):
 
                 query += ' topic="{}" and (timestamp between {} and {})'.format(
                     parameters['topic'], start_date, end_date)
-                print(query)
+                # print(query)
                 result = dbexec('select', query)
 
             # Display insights
             if self.path == '/displayinsights':
 
                 if result['success'] and result['rows_returned'] > 0:
-                    content = '<ul class="timeline">'
+                    timeline = ''
+                    amount_pos = 0
+                    amount_neg = 0
+
+                    timeline = '<ul class="timeline">'
                     for myrow in result['data']:
                         human_time = timestampToDate(myrow[3])
 
                         if myrow[9] == 'pos':
                             sentiment_color = 'green'
+                            amount_pos += 1
                         if myrow[9] == 'neg':
                             sentiment_color = 'red'
+                            amount_neg += 1
                         if myrow[9] == 'neu':
                             sentiment_color = 'yellow'
 
-                        content += parseTemplate('content-timeline-item.html', {
+                        timeline += parseTemplate('content-timeline-item.html', {
                             '{date}': human_time,
                             '{source}': myrow[4],
                             '{title}': myrow[1],
@@ -177,12 +185,20 @@ class myHandler(BaseHTTPRequestHandler):
                             '{sentiment_color}': sentiment_color
 
                         })
-                    content += '</ul>'
+                    timeline += '</ul>'
+
+                    summary = parseTemplate('content-bar-chart.html', {
+                        '{total_articles}': result['rows_returned'],
+                        '{negs}': amount_neg,
+                        '{poss}': amount_pos
+                    })
+
+                    content = summary + timeline
                 else:
                     content = parseTemplate('content-message.html', {
                         '{type}': 'warning',
                         '{message_title}': 'Warning',
-                        '{message_text}': 'There are no data for this criteria. <br> Please try again',
+                        '{message_text}': 'There are no data matching this criteria. <br> Please try again',
                     })
 
             # Build the training set
@@ -236,8 +252,15 @@ class myHandler(BaseHTTPRequestHandler):
                         '{message_text}': 'There are no data for this criteria. <br> Please try again',
                     })
 
-            message = parseTemplate(
-                'layout2.html', {'{page_content}': content})
+            # test if amount_neg and amount_pos are defined
+            try:
+                amount_neg
+            except:
+                message = parseTemplate(
+                    'layout2.html', {'{page_content}': content})
+            else:
+                message = parseTemplate(
+                    'layout2.html', {'{page_content}': content, '{negs}': str(amount_neg), '{poss}': str(amount_pos)})
 
             self.wfile.write(message.encode())
 
@@ -249,7 +272,7 @@ class myHandler(BaseHTTPRequestHandler):
 
 pages = [
     '/',
-    '/dashboard',
+    '/home',
     '/stats',
     '/insights',
     '/displayinsights',

@@ -12,7 +12,9 @@
     <!-- <link rel="stylesheet" href="http://maxsales.gr/bower_components/font-awesome/css/font-awesome.min.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Ionicons -->
-    <link rel="stylesheet" href="http://maxsales.gr/bower_components/Ionicons/css/ionicons.min.css">
+    <!-- <link rel="stylesheet" href="http://maxsales.gr/bower_components/Ionicons/css/ionicons.min.css"> -->
+    <link href="https://unpkg.com/ionicons@4.1.2/dist/css/ionicons.min.css" rel="stylesheet">
+
     <!-- daterange picker -->
     <link rel="stylesheet" href="http://maxsales.gr/bower_components/bootstrap-daterangepicker/daterangepicker.css">
     <!-- bootstrap datepicker -->
@@ -204,9 +206,9 @@
 
 
                     <li>
-                        <a href="dashboard">
+                        <a href="home">
                             <i class="fa fa-link"></i>
-                            <span>Dashboard</span>
+                            <span>Home</span>
                         </a>
                     </li>
 
@@ -220,14 +222,14 @@
                     <li>
                         <a href="insights">
                             <i class="fa fa-link"></i>
-                            <span>Insights</span>
+                            <span>Search</span>
                         </a>
                     </li>
 
                     <li>
                         <a href="buildtrainingset">
                             <i class="fa fa-link"></i>
-                            <span>Build training set</span>
+                            <span>Build a training set</span>
                         </a>
                     </li>
 
@@ -390,6 +392,14 @@
     <script src="http://maxsales.gr/js/adminlte.min.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="http://maxsales.gr/js/demo.js"></script>
+    <!-- FLOT CHARTS -->
+    <script src="http://maxsales.gr/bower_components/Flot/jquery.flot.js"></script>
+    <!-- FLOT RESIZE PLUGIN - allows the chart to redraw when the window is resized -->
+    <script src="http://maxsales.gr/bower_components/Flot/jquery.flot.resize.js"></script>
+    <!-- FLOT PIE PLUGIN - also used to draw donut charts -->
+    <script src="http://maxsales.gr/bower_components/Flot/jquery.flot.pie.js"></script>
+    <!-- FLOT CATEGORIES PLUGIN - Used to draw bar charts -->
+    <script src="http://maxsales.gr/bower_components/Flot/jquery.flot.categories.js"></script>
     <!-- Page script -->
     <script>
         $(function () {
@@ -415,6 +425,32 @@
                     }
                 }
             )
+
+
+
+
+            var bar_data = {
+                data: [['Positive', {poss}], ['Negative', {negs}]],
+                color: '#3c8dbc'
+            }
+            $.plot('#bar-chart', [bar_data], {
+                grid: {
+                    borderWidth: 1,
+                    borderColor: '#f3f3f3',
+                    tickColor: '#f3f3f3'
+                },
+                series: {
+                    bars: {
+                        show: true,
+                        barWidth: 0.5,
+                        align: 'center'
+                    }
+                },
+                xaxis: {
+                    mode: 'categories',
+                    tickLength: 0
+                }
+            })
             //Date range picker with time picker
             // $('#reservationtime').daterangepicker({ timePicker: true, timePickerIncrement: 30, format: 'DD/MM/YYYY h:mm A' })
             // //Date range as a button

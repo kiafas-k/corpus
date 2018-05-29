@@ -79,20 +79,32 @@ def getStats():
     result = dbexec('select', query)
     if result['success']:
         sources = result['rows_returned']
+        sources_list = []
+        for myrow in result['data']:
+            sources_list.append(myrow[0])
+        sources_full = '<br>'.join(sources_list)
     else:
         sources = 'N/A'
+        sources_full = ''
 
     stats['sources'] = sources
+    stats['sources_full'] = sources_full
 
     # get topics
     query = 'select distinct topic from tbl_articles'
     result = dbexec('select', query)
     if result['success']:
         topics = result['rows_returned']
+        topics_list = []
+        for myrow in result['data']:
+            topics_list.append(myrow[0])
+        topics_full = '<br>'.join(topics_list)
     else:
         topics = 'N/A'
+        topics_full = ''
 
     stats['topics'] = topics
+    stats['topics_full'] = topics_full
 
     return(stats)
 
