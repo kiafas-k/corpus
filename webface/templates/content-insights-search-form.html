@@ -33,6 +33,7 @@
                     <div class="form-group">
                         <label>Select Topic</label>
                         <select class="form-control" name="topic">
+                            <option selected value="any">Any Topic</option>
                             {topic_options}
                         </select>
                     </div>
@@ -40,7 +41,7 @@
 
                     <div class="form-group">
                         <label>Select Entities</label>
-                        <select multiple class="form-control" name="entities[]">
+                        <select multiple class="form-control" name="entities[]" style="height: 200px">
                             {entity_options}
                         </select>
                     </div>

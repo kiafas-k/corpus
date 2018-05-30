@@ -128,12 +128,14 @@ def prepareData():
     for myrow in result['data']:
         row_entities = myrow[0].split(';')
         for entity in row_entities:
-            named_entities.append(entity)
+            if len(entity) > 4:
+                named_entities.append(entity.lower())
 
-    named_entities.sort()
     unique_entities = set(named_entities)
+    entities_list = list(unique_entities)
+    entities_list.sort()
 
-    data['named_entities'] = unique_entities
+    data['named_entities'] = entities_list
 
     # get topics
     topics = []

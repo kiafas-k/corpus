@@ -149,9 +149,14 @@ class myHandler(BaseHTTPRequestHandler):
                 if counter > 0:
                     query += ' and '
 
-                query += ' topic="{}" and (timestamp between {} and {})'.format(
-                    parameters['topic'], start_date, end_date)
-                # print(query)
+                if not parameters['topic'] == 'any':
+                    topic = ' topic="{}" '.format(parameters['topic'])
+                else:
+                    topic = ' topic like "%" '
+
+                query += ' {} and (timestamp between {} and {})'.format(topic,
+                                                                        start_date, end_date)
+                print(query)
                 result = dbexec('select', query)
 
             # Display insights
@@ -177,7 +182,7 @@ class myHandler(BaseHTTPRequestHandler):
 
                         timeline += parseTemplate('content-timeline-item.html', {
                             '{date}': human_time,
-                            '{source}': myrow[4],
+                            '{topic}': myrow[8],
                             '{title}': myrow[1],
                             '{body}': myrow[6][:300],
                             '{url}': myrow[2],
