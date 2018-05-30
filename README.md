@@ -5,6 +5,10 @@ Journalists can use it to visualise and monitor sentiment and public opinion abo
 Corpus can also be used to visualize and examine the impact of a significant event to the stock market.
 The longer the parser is on-line the larger the corpora becomes leading to more accurate results.
 
+
+[![CORPUS](http://www.mauroudis.gr/Images/corpus-youtube.jpg)](https://youtu.be/0uQ7QGozumU)
+
+
 It is consisted of 2 sub systems:
 - Parser
 - Webface
