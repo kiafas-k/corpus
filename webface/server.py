@@ -32,6 +32,20 @@ def find_features(document, word_features):
 
 class myHandler(BaseHTTPRequestHandler):
 
+    def create_db(self):
+        configuration = configparser.ConfigParser()
+        configuration.read('webface/config.ini')
+
+        self.dbase = dbal(
+            {
+                'host': configuration['DATABASE']['host'],
+                'username': configuration['DATABASE']['username'],
+                'password': configuration['DATABASE']['password'],
+                'database': configuration['DATABASE']['database'],
+                'charset': configuration['DATABASE']['charset']
+            }
+        )
+
     def return404Error(self):
         self.send_response(404)
         self.send_header('Content-type', 'text/html')
@@ -129,18 +143,6 @@ class myHandler(BaseHTTPRequestHandler):
 
             # common actions for /displayinsights and /buildtrainingset
             if self.path in ('/displayinsights', '/buildtrainingset'):
-                configuration = configparser.ConfigParser()
-                configuration.read('webface/config.ini')
-
-                dbase = dbal(
-                    {
-                        'host': configuration['DATABASE']['host'],
-                        'username': configuration['DATABASE']['username'],
-                        'password': configuration['DATABASE']['password'],
-                        'database': configuration['DATABASE']['database'],
-                        'charset': configuration['DATABASE']['charset']
-                    }
-                )
 
                 parameters = handlePOSTdata(post_data)
 
@@ -171,7 +173,8 @@ class myHandler(BaseHTTPRequestHandler):
                 query += ' {} and (timestamp between {} and {})'.format(topic,
                                                                         start_date, end_date)
                 # print(query)
-                result = dbase.select(query)
+                self.create_db()
+                result = self.dbase.select(query)
 
             # Display insights
             if self.path == '/displayinsights':
@@ -282,6 +285,8 @@ class myHandler(BaseHTTPRequestHandler):
                     'layout2.html', {'{page_content}': content, '{negs}': str(amount_neg), '{poss}': str(amount_pos)})
 
             self.wfile.write(message.encode())
+
+            del self.dbase
 
         else:
             self.return404Error()
