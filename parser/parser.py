@@ -5,6 +5,21 @@ import MySQLdb
 import configparser
 import sys
 import os
+from dbal import dbal
+
+# init dbase
+configuration = configparser.ConfigParser()
+configuration.read('parser/config.ini')
+
+dbase = dbal(
+    {
+        'host': configuration['DATABASE']['host'],
+        'username': configuration['DATABASE']['username'],
+        'password': configuration['DATABASE']['password'],
+        'database': configuration['DATABASE']['database'],
+        'charset': configuration['DATABASE']['charset']
+    }
+)
 
 
 path_prefix = ''
@@ -36,9 +51,10 @@ for wrd in lines:
 
 # load sources
 query = 'select * from tbl_sources where active=1 order by id'
-sources = dbexec('select', query)
+result = dbase.select(query)
+sources = result.data
 
-for src in sources['data']:
+for src in sources:
     print('scanning source [{}]'.format(src[1]))
 
     # download articles
@@ -72,28 +88,19 @@ for src in sources['data']:
                 sentiment = 'neg'
 
             if sentiment_analysis['text_size'] > 0:
-                configuration = configparser.ConfigParser()
-                configuration.read('parser/config.ini')
 
-                db = MySQLdb.connect(
-                    configuration['DATABASE']['host'], configuration['DATABASE']['username'], configuration['DATABASE']['password'], configuration['DATABASE']['database'],)
-                db.set_character_set('utf8')
-                cursor = db.cursor()
+                result = dbase.insert(
+                    {
+                        'field_names': ['title', 'url', 'timestamp', 'source', 'keywords', 'text', 'named_entities', 'topic', 'sentiment'],
+                        'field_values': [title, url, timestamp, source, keywords, text, named_entities, topic, sentiment],
+                        'table_name': 'tbl_articles'
+                    }
+                )
 
-                text = removeQuotes(text)
-                text = str(db.escape_string(text))
-                text = text[2: - 2]
-
-                title = removeQuotes(title)
-                title = str(db.escape_string(title))
-                title = title[2: -2]
-
-                query = '''insert into tbl_articles (title,url,timestamp,source,keywords,text,named_entities,topic,sentiment) values (%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
-
-                cursor.execute(query, (title, url, timestamp, source,
-                                       keywords, text, named_entities, topic, sentiment))
-                db.commit()
-                db.close()
+                if result.success == False:
+                    print(
+                        'Failed to insert {} - ({})'.format(article.title, article.url))
+                    print(result.summary())
 
         except:
             print('failed to store {}'.format(article.title))

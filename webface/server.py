@@ -9,6 +9,7 @@ import random
 from nltk import word_tokenize, FreqDist, NaiveBayesClassifier, classify
 import pickle
 import configparser
+from dbal import dbal
 
 
 def loadFile(filename):
@@ -128,6 +129,19 @@ class myHandler(BaseHTTPRequestHandler):
 
             # common actions for /displayinsights and /buildtrainingset
             if self.path in ('/displayinsights', '/buildtrainingset'):
+                configuration = configparser.ConfigParser()
+                configuration.read('webface/config.ini')
+
+                dbase = dbal(
+                    {
+                        'host': configuration['DATABASE']['host'],
+                        'username': configuration['DATABASE']['username'],
+                        'password': configuration['DATABASE']['password'],
+                        'database': configuration['DATABASE']['database'],
+                        'charset': configuration['DATABASE']['charset']
+                    }
+                )
+
                 parameters = handlePOSTdata(post_data)
 
                 timespan = urllib.parse.unquote(
@@ -156,19 +170,19 @@ class myHandler(BaseHTTPRequestHandler):
 
                 query += ' {} and (timestamp between {} and {})'.format(topic,
                                                                         start_date, end_date)
-                print(query)
-                result = dbexec('select', query)
+                # print(query)
+                result = dbase.select(query)
 
             # Display insights
             if self.path == '/displayinsights':
 
-                if result['success'] and result['rows_returned'] > 0:
+                if result.success and result.rows_affected > 0:
                     timeline = ''
                     amount_pos = 0
                     amount_neg = 0
 
                     timeline = '<ul class="timeline">'
-                    for myrow in result['data']:
+                    for myrow in result.data:
                         human_time = timestampToDate(myrow[3])
 
                         if myrow[9] == 'pos':
@@ -193,7 +207,7 @@ class myHandler(BaseHTTPRequestHandler):
                     timeline += '</ul>'
 
                     summary = parseTemplate('content-bar-chart.html', {
-                        '{total_articles}': result['rows_returned'],
+                        '{total_articles}': result.rows_affected,
                         '{negs}': amount_neg,
                         '{poss}': amount_pos
                     })
@@ -208,12 +222,12 @@ class myHandler(BaseHTTPRequestHandler):
 
             # Build the training set
             if self.path == '/buildtrainingset':
-                if result['success'] and result['rows_returned'] > 0:
+                if result.success and result.rows_affected > 0:
                     try:
                         documents = []
                         all_words = []
 
-                        for myrow in result['data']:
+                        for myrow in result.data:
                             sentiment = myrow[9]
                             article_words = filterText(myrow[6], False)
                             documents.append([article_words, sentiment])

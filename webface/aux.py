@@ -5,6 +5,7 @@ import datetime
 from nltk import PorterStemmer, word_tokenize
 from nltk.corpus import stopwords
 import random
+from dbal import dbal
 
 
 def dbexec(operation_type, query):
@@ -61,14 +62,26 @@ def parseTemplate(filename, pagedata):
 
 
 def getStats():
+    configuration = configparser.ConfigParser()
+    configuration.read('webface/config.ini')
+
+    dbase = dbal(
+        {
+            'host': configuration['DATABASE']['host'],
+            'username': configuration['DATABASE']['username'],
+            'password': configuration['DATABASE']['password'],
+            'database': configuration['DATABASE']['database'],
+            'charset': configuration['DATABASE']['charset']
+        }
+    )
 
     stats = {}
 
     # count total articles
     query = 'select count(id) from tbl_articles'
-    result = dbexec('select', query)
-    if result['success']:
-        total_articles = result['data'][0][0]
+    result = dbase.select(query)
+    if result.success:
+        total_articles = result.data[0][0]
     else:
         total_articles = 'N/A'
 
@@ -76,11 +89,11 @@ def getStats():
 
     # get sources
     query = 'select distinct source from tbl_articles'
-    result = dbexec('select', query)
-    if result['success']:
-        sources = result['rows_returned']
+    result = dbase.select(query)
+    if result.success:
+        sources = result.rows_affected
         sources_list = []
-        for myrow in result['data']:
+        for myrow in result.data:
             sources_list.append(myrow[0])
         sources_full = '<br>'.join(sources_list)
     else:
@@ -92,11 +105,11 @@ def getStats():
 
     # get topics
     query = 'select distinct topic from tbl_articles'
-    result = dbexec('select', query)
-    if result['success']:
-        topics = result['rows_returned']
+    result = dbase.select(query)
+    if result.success:
+        topics = result.rows_affected
         topics_list = []
-        for myrow in result['data']:
+        for myrow in result.data:
             topics_list.append(myrow[0])
         topics_full = '<br>'.join(topics_list)
     else:
@@ -106,26 +119,41 @@ def getStats():
     stats['topics'] = topics
     stats['topics_full'] = topics_full
 
+    del(dbase)
+
     return(stats)
 
 
 def prepareData():
+
+    configuration = configparser.ConfigParser()
+    configuration.read('webface/config.ini')
+
+    dbase = dbal(
+        {
+            'host': configuration['DATABASE']['host'],
+            'username': configuration['DATABASE']['username'],
+            'password': configuration['DATABASE']['password'],
+            'database': configuration['DATABASE']['database'],
+            'charset': configuration['DATABASE']['charset']
+        }
+    )
 
     data = {}
 
     # get timespan
     timespan = {}
     query = 'select max(timestamp) as newest, min(timestamp) as oldest from tbl_articles'
-    result = dbexec('select', query)
-    timespan['newest'] = result['data'][0][0]
-    timespan['oldest'] = result['data'][0][1]
+    result = dbase.select(query)
+    timespan['newest'] = result.data[0][0]
+    timespan['oldest'] = result.data[0][1]
     data['timespan'] = timespan
 
     # get named entities
     named_entities = []
     query = 'select named_entities from tbl_articles order by id'
-    result = dbexec('select', query)
-    for myrow in result['data']:
+    result = dbase.select(query)
+    for myrow in result.data:
         row_entities = myrow[0].split(';')
         for entity in row_entities:
             if len(entity) > 4:
@@ -140,12 +168,13 @@ def prepareData():
     # get topics
     topics = []
     query = 'select distinct topic from tbl_articles'
-    result = dbexec('select', query)
-    for myrow in result['data']:
+    result = dbase.select(query)
+    for myrow in result.data:
         topics.append(myrow[0])
 
     data['topics'] = topics
 
+    del dbase
     return data
 
 
