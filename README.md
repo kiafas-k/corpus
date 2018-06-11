@@ -81,4 +81,5 @@ The command to execute the webface is :
 Webface uses the Python's HTTPServer library and it serves for ever. If you want to stop the server you have to do it manualy.
 
 
-
+## Citations
+This application makes use of the [NRC Word-Emotion Association Lexicon](http://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm), created by Saif Mohammad (email: saif.mohammad@nrc-cnrc.gc.ca | phone: +1-613-993-0620) at the National Research Council Canada.
