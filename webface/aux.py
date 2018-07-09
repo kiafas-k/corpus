@@ -8,43 +8,6 @@ import random
 from dbal import dbal
 
 
-def dbexec(operation_type, query):
-    configuration = configparser.ConfigParser()
-    configuration.read('webface/config.ini')
-
-    result = {
-        'success': True,
-        'data': (),
-        'rows_returned': 0,
-
-    }
-
-    if not operation_type in['insert', 'update', 'delete', 'select']:
-        result['success'] = False
-    else:
-        db = MySQLdb.connect(
-            configuration['DATABASE']['host'], configuration['DATABASE']['username'], configuration['DATABASE']['password'], configuration['DATABASE']['database'],)
-        db.set_character_set('utf8')
-        cursor = db.cursor()
-
-        try:
-            if operation_type == 'select':
-                cursor.execute(query)
-                result['data'] = cursor.fetchall()
-                result['rows_returned'] = cursor.rowcount
-
-            if operation_type == 'insert':
-                cursor.execute(db.escape_string(query))
-                db.commit()
-
-        except:
-            result['success'] = False
-
-        db.close()
-
-    return result
-
-
 def parseTemplate(filename, pagedata):
     try:
         fl = open('webface/templates/' + filename, 'r')
